@@ -8,10 +8,12 @@ description: >
   "single run tool", "CLI for agents", "tool interface design", "agent tool architecture",
   "function calling vs CLI", "overflow mode", "binary guard", "agent output format".
 license: MIT
-compatibility: opencode, openclaw
+compatibility: opencode, openclaw, pinix
 metadata:
-  author: Former Manus backend lead (via agent-clip / Pinix projects)
-  source: https://github.com/epiral/agent-clip
+  author: Former Manus backend lead
+  credit: epiral (https://github.com/epiral)
+  source_app: https://github.com/epiral/agent-clip
+  source_platform: https://github.com/epiral/pinix
   audience: agent developers, AI infrastructure engineers
   workflow: agent-design
 ---
@@ -20,7 +22,7 @@ metadata:
 
 > A single `run(command="...")` tool with Unix-style commands outperforms a catalog of typed function calls.
 
-This skill encodes the design principles distilled from 2 years of production agent work at Manus and the open-source [agent-clip](https://github.com/epiral/agent-clip) runtime.
+**Credit:** This design was authored by the backend lead at [Manus](https://manus.im) and is implemented in the open-source [agent-clip](https://github.com/epiral/agent-clip) runtime by [@epiral](https://github.com/epiral). This skill packages that knowledge for use in OpenCode, OpenClaw, and Pinix.
 
 ---
 
@@ -177,13 +179,13 @@ Raw command output ≠ what the LLM should receive. Two hard LLM constraints dri
 - **Constraint B:** LLMs cannot process binary data (produces meaningless high-entropy tokens that degrade surrounding attention)
 
 ```
-┌─────────────────────────────────────────────┐
-│  Layer 2: LLM Presentation Layer            │  ← Designed for LLM constraints
-│  Binary guard | Truncation+overflow | Meta   │
-├─────────────────────────────────────────────┤
-│  Layer 1: Unix Execution Layer              │  ← Pure Unix semantics
-│  Command routing | pipe | chain | exit code │
-└─────────────────────────────────────────────┘
+┌─────────────────────────────────────────────────┐
+│  Layer 2: LLM Presentation Layer                │  ← Designed for LLM constraints
+│  Binary guard | Truncation+overflow | Meta      │
+├─────────────────────────────────────────────────┤
+│  Layer 1: Unix Execution Layer                  │  ← Pure Unix semantics
+│  Command routing | pipe | chain | exit code     │
+└─────────────────────────────────────────────────┘
 ```
 
 **CRITICAL:** Layer 1 must be **raw, lossless, metadata-free**. If you truncate in Layer 1, `grep` only searches the first 200 lines. If you add `[exit:0]` in Layer 1, it becomes grep data. Processing only happens in Layer 2.
@@ -256,7 +258,12 @@ Safety boundaries are external (not iteration limits):
 
 ## Implementation Reference
 
-Source: [github.com/epiral/agent-clip](https://github.com/epiral/agent-clip) (Go)
+**Original implementation by [@epiral](https://github.com/epiral):**
+
+| Repo | Description |
+|------|-------------|
+| [epiral/agent-clip](https://github.com/epiral/agent-clip) | The agent as a Pinix Clip — full Go implementation of these principles |
+| [epiral/pinix](https://github.com/epiral/pinix) | Decentralized runtime platform that hosts Clips (BoxLite micro-VMs, Edge Clips) |
 
 | File | Responsibility |
 |------|---------------|
